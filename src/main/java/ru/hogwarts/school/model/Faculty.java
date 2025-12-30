@@ -4,7 +4,9 @@ import jakarta.persistence.Entity;
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 
+import java.util.Collection;
 import java.util.Objects;
 
 @Entity
@@ -16,6 +18,9 @@ public class Faculty {
 
     private String name;
     private String color;
+
+    @OneToMany(mappedBy = "faculty")
+    private Collection<Student> students;
 
     public Faculty() {
     }
@@ -63,10 +68,6 @@ public class Faculty {
 
     @Override
     public String toString() {
-        return "Faculty{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", color='" + color + '\'' +
-                '}';
+        return "Faculty{" + "id=" + id + ", name='" + name + '\'' + ", color='" + color + '\'' + '}';
     }
 }

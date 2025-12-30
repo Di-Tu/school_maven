@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.model.Faculty;
+import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.FacultyService;
 
 import java.util.Collection;
@@ -17,7 +18,7 @@ public class FacultyController {
         this.facultyService = facultyService;
     }
 
-    @GetMapping("{id}")
+    @GetMapping("id/{id}")
     public ResponseEntity<Faculty> getFaculty(@PathVariable("id") Long id) {
         Faculty faculty = facultyService.findFacultyById(id);
         if (faculty == null) {
@@ -26,8 +27,26 @@ public class FacultyController {
         return ResponseEntity.ok(faculty);
     }
 
+    @GetMapping("search/{search}")
+    public ResponseEntity<Collection<Faculty>> searchFacultyByNameOrColor(@PathVariable String search) {
+        Collection<Faculty> faculties = facultyService.findFacultyByNameOrColor(search);
+        if (faculties.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(faculties);
+    }
+
     @GetMapping
-    public ResponseEntity<Collection<Faculty>> getAllFaculty() {
+    public ResponseEntity<Collection<Faculty>> getFacultyByColorOrAll(@RequestParam(required = false) String color) {
+
+        if (color != null) {
+            Collection<Faculty> faculties = facultyService.findFacultyByColor(color);
+            if (faculties.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(faculties);
+        }
+
         Collection<Faculty> faculties = facultyService.findAllFaculties();
         if (faculties.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -35,13 +54,13 @@ public class FacultyController {
         return ResponseEntity.ok(faculties);
     }
 
-    @GetMapping(params = "color")
-    public ResponseEntity<Collection<Faculty>> getFacultyByColor(@RequestParam String color) {
-        Collection<Faculty> faculties = facultyService.findFacultyByColor(color);
-        if (faculties.isEmpty()) {
-            return ResponseEntity.noContent().build();
+    @GetMapping("students/{id}")
+    public ResponseEntity<Collection<Student>> getStudentsByFacultyById(@PathVariable Long id) {
+        Collection<Student> students = facultyService.findStudentsByFacultyById(id);
+        if (students.isEmpty()) {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(faculties);
+        return ResponseEntity.ok(students);
     }
 
     @PostMapping
