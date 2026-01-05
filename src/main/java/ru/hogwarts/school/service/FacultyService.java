@@ -1,6 +1,8 @@
 package ru.hogwarts.school.service;
 
 import org.springframework.stereotype.Service;
+import ru.hogwarts.school.exception.NotFoundException;
+import ru.hogwarts.school.exception.BadRequestException;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
@@ -23,7 +25,7 @@ public class FacultyService {
     }
 
     public Faculty findFacultyById(Long id) {
-        return facultyRepository.findById(id).orElse(null);
+        return facultyRepository.findById(id).orElseThrow(() -> new NotFoundException("Факультет с id " + id + " не найден."));
     }
 
     public Collection<Faculty> findAllFaculties() {
@@ -35,10 +37,16 @@ public class FacultyService {
     }
 
     public Faculty updateFaculty(Faculty faculty) {
+        if (!facultyRepository.existsById(faculty.getId())) {
+            throw new BadRequestException("Факультет с id: " + faculty.getId() + " не найден, обновление невозможно.");
+        }
         return facultyRepository.save(faculty);
     }
 
     public void deleteFaculty(Long id) {
+        if (!facultyRepository.existsById(id)) {
+            throw new NotFoundException("Факультет с id " + id + " не найден.");
+        }
         facultyRepository.deleteById(id);
     }
 
@@ -47,6 +55,9 @@ public class FacultyService {
     }
 
     public Collection<Student> findStudentsByFacultyById(Long id) {
+        if (!facultyRepository.existsById(id)) {
+            throw new NotFoundException("Факультет с id " + id + " не найден.");
+        }
         return studentRepository.findByFacultyId(id);
     }
 }
