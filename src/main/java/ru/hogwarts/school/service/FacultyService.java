@@ -1,14 +1,17 @@
 package ru.hogwarts.school.service;
 
 import org.springframework.stereotype.Service;
+import ru.hogwarts.school.exception.FacultyDuplicateException;
+import ru.hogwarts.school.exception.FacultyNotFoundException;
+import ru.hogwarts.school.exception.FacultyValidationException;
 import ru.hogwarts.school.exception.NotFoundException;
-import ru.hogwarts.school.exception.BadRequestException;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.repository.StudentRepository;
 
 import java.util.Collection;
+import java.util.Optional;
 
 @Service
 public class FacultyService {
@@ -38,14 +41,29 @@ public class FacultyService {
 
     public Faculty updateFaculty(Faculty faculty) {
         if (!facultyRepository.existsById(faculty.getId())) {
-            throw new BadRequestException("Факультет с id: " + faculty.getId() + " не найден, обновление невозможно.");
+            throw new FacultyNotFoundException(
+                    "Факультет с id: " + faculty.getId() + " не найден, обновление невозможно."
+            );
+        }
+//        Проверяем на пустое название
+        if (faculty.getName() == null || faculty.getName().trim().isEmpty()) {
+            throw new FacultyValidationException("Название факультета не может быть пустым");
+        }
+//        Проверяем на повторный ввод факультета
+        Optional<Faculty> existing = facultyRepository.findAll().stream()
+                .filter(f -> f.getName().equalsIgnoreCase(faculty.getName()) && f.getId() != faculty.getId())
+                .findFirst();
+        if (existing.isPresent()) {
+            throw new FacultyDuplicateException(
+                    "Факультет с названием '" + faculty.getName() + "' уже существует"
+            );
         }
         return facultyRepository.save(faculty);
     }
 
     public void deleteFaculty(Long id) {
         if (!facultyRepository.existsById(id)) {
-            throw new NotFoundException("Факультет с id " + id + " не найден.");
+            throw new FacultyNotFoundException("Факультет с id " + id + " не найден.");
         }
         facultyRepository.deleteById(id);
     }
