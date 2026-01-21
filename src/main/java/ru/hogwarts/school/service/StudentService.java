@@ -1,6 +1,9 @@
 package ru.hogwarts.school.service;
 
 import org.springframework.stereotype.Service;
+import ru.hogwarts.school.exception.NotFoundException;
+import ru.hogwarts.school.exception.BadRequestException;
+import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.StudentRepository;
 
@@ -20,7 +23,7 @@ public class StudentService {
     }
 
     public Student findStudentById(Long id) {
-        return studentRepository.findById(id).orElse(null);
+        return studentRepository.findById(id).orElseThrow(() -> new NotFoundException("Студент с id " + id + " не найден."));
     }
 
     public Collection<Student> findStudentsByAge(int age) {
@@ -32,10 +35,34 @@ public class StudentService {
     }
 
     public Student updateStudent(Student student) {
+        if (!studentRepository.existsById(student.getId())) {
+            throw new BadRequestException("Студента с id: " + student.getId() + " не существует, обновление невозможно. ");
+        }
         return studentRepository.save(student);
     }
 
     public void deleteStudent(Long id) {
+        if (!studentRepository.existsById(id)) {
+            throw new NotFoundException("Студент с id " + id + " не найден.");
+        }
         studentRepository.deleteById(id);
+    }
+
+    public Collection<Student> findStudentsByAgeBetween(int min, int max) {
+        if (min > max) {
+            throw new BadRequestException("Минимальный возраст не может быть больше максимального возраста.");
+        }
+        return studentRepository.findByAgeBetween(min, max);
+    }
+
+    public Faculty findFacultyByIdStudent(Long id) {
+        if (!studentRepository.existsById(id)) {
+            throw new NotFoundException("Студент с id " + id + " не найден. Введите корректный id студента.");
+        }
+        Faculty faculty = studentRepository.findFacultyByStudentId(id);
+        if (faculty == null) {
+            throw new NotFoundException("У студента с id: " + id + " нет факультета.");
+        }
+        return faculty;
     }
 }
