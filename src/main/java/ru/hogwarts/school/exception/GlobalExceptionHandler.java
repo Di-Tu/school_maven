@@ -13,13 +13,28 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleAllExceptions(Exception ex, WebRequest request) {
         System.err.println("Произошла ошибка: " + ex.getMessage());
         ex.printStackTrace();
-
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Внутренняя ошибка сервера. Пожалуйста, попробуйте позже.");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Внутренняя ошибка сервера. Пожалуйста, попробуйте позже.");
     }
 
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<String> handleNotFound(NotFoundException ex) {
+    @ExceptionHandler(FacultyNotFoundException.class)
+    public ResponseEntity<String> handleFacultyNotFound(FacultyNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(StudentNotFoundException.class)
+    public ResponseEntity<String> handleStudentNotFound(StudentNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(FacultyValidationException.class)
+    public ResponseEntity<String> handleFacultyValidation(FacultyValidationException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(FacultyDuplicateException.class)
+    public ResponseEntity<String> handleFacultyDuplicate(FacultyDuplicateException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 
     @ExceptionHandler(BadRequestException.class)
