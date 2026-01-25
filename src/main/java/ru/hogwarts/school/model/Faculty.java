@@ -19,7 +19,7 @@ public class Faculty {
 
     @OneToMany(mappedBy = "faculty", fetch = FetchType.LAZY)
     @JsonManagedReference
-    @JsonIgnore
+//    @JsonIgnore
     private Collection<Student> students;
 
     public Faculty() {
@@ -54,6 +54,14 @@ public class Faculty {
         this.color = color;
     }
 
+    public Collection<Student> getStudents() {
+        return students;
+    }
+
+    public void setStudents(Collection<Student> students) {
+        this.students = students;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -68,6 +76,11 @@ public class Faculty {
 
     @Override
     public String toString() {
-        return "Faculty{" + "id=" + id + ", name='" + name + '\'' + ", color='" + color + '\'' + '}';
+        return "Faculty{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", color='" + color + '\'' +
+                ", studentsCount=" + (students != null ? students.size() : 0) +
+                '}';
     }
 }
