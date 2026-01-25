@@ -24,8 +24,7 @@ public class StudentService {
     }
 
     public Student findStudentById(Long id) {
-        return studentRepository.findById(id)
-                .orElseThrow(() -> new StudentNotFoundException("Студент с id " + id + " не найден."));
+        return studentRepository.findById(id).orElseThrow(() -> new StudentNotFoundException("Студент с id " + id + " не найден."));
     }
 
     public Collection<Student> findStudentsByAge(int age) {
@@ -38,9 +37,7 @@ public class StudentService {
 
     public Student updateStudent(Student student) {
         if (!studentRepository.existsById(student.getId())) {
-            throw new StudentNotFoundException(
-                    "Студент с id: " + student.getId() + " не существует, обновление невозможно."
-            );
+            throw new StudentNotFoundException("Студент с id: " + student.getId() + " не существует, обновление невозможно.");
         }
         return studentRepository.save(student);
     }
@@ -61,9 +58,7 @@ public class StudentService {
 
     public Faculty findFacultyByIdStudent(Long id) {
         if (!studentRepository.existsById(id)) {
-            throw new StudentNotFoundException(
-                    "Студент с id " + id + " не найден. Введите корректный id студента."
-            );
+            throw new StudentNotFoundException("Студент с id " + id + " не найден. Введите корректный id студента.");
         }
         Faculty faculty = studentRepository.findFacultyByStudentId(id);
         if (faculty == null) {

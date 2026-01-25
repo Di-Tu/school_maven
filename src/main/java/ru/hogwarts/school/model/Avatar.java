@@ -99,13 +99,6 @@ public class Avatar {
 
     @Override
     public String toString() {
-        return "Avatar{" +
-                "id=" + id +
-                ", filePath='" + filePath + '\'' +
-                ", fileSize=" + fileSize +
-                ", mediaType='" + mediaType + '\'' +
-                ", data=" + Arrays.toString(data) +
-                ", student=" + student +
-                '}';
+        return "Avatar{" + "id=" + id + ", filePath='" + filePath + '\'' + ", fileSize=" + fileSize + ", mediaType='" + mediaType + '\'' + ", data=" + Arrays.toString(data) + ", student=" + student + '}';
     }
 }

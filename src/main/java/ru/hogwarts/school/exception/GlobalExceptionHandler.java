@@ -13,8 +13,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleAllExceptions(Exception ex, WebRequest request) {
         System.err.println("Произошла ошибка: " + ex.getMessage());
         ex.printStackTrace();
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Внутренняя ошибка сервера. Пожалуйста, попробуйте позже.");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Внутренняя ошибка сервера. Пожалуйста, попробуйте позже.");
     }
 
     @ExceptionHandler(FacultyNotFoundException.class)

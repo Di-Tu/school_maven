@@ -34,25 +34,16 @@ public class AvatarService {
     }
 
     public Avatar uploadAvatar(Long studentId, MultipartFile avatarFile) throws IOException {
-        Student student = studentRepository.findById(studentId)
-                .orElseThrow(() -> new StudentNotFoundException("Студент с id " + studentId + " не найден"));
+        Student student = studentRepository.findById(studentId).orElseThrow(() -> new StudentNotFoundException("Студент с id " + studentId + " не найден"));
 
-        // Создаем директорию, если она не существует
         Path filePath = Path.of(avatarsDir, studentId + "_" + avatarFile.getOriginalFilename());
         Files.createDirectories(filePath.getParent());
         Files.deleteIfExists(filePath);
 
-        // Сохраняем файл на диск
-        try (
-                InputStream is = avatarFile.getInputStream();
-                OutputStream os = Files.newOutputStream(filePath, CREATE_NEW);
-                BufferedInputStream bis = new BufferedInputStream(is, BUFFER_SIZE);
-                BufferedOutputStream bos = new BufferedOutputStream(os, BUFFER_SIZE);
-        ) {
+        try (InputStream is = avatarFile.getInputStream(); OutputStream os = Files.newOutputStream(filePath, CREATE_NEW); BufferedInputStream bis = new BufferedInputStream(is, BUFFER_SIZE); BufferedOutputStream bos = new BufferedOutputStream(os, BUFFER_SIZE);) {
             bis.transferTo(bos);
         }
 
-        // Сохраняем информацию в БД
         Avatar avatar = findAvatarByStudentId(studentId).orElse(new Avatar());
         avatar.setStudent(student);
         avatar.setFilePath(filePath.toString());
@@ -69,22 +60,19 @@ public class AvatarService {
     }
 
     public byte[] getAvatarFromFile(Long studentId) throws IOException {
-        Avatar avatar = findAvatarByStudentId(studentId)
-                .orElseThrow(() -> new StudentNotFoundException("Аватар для студента с id " + studentId + " не найден"));
+        Avatar avatar = findAvatarByStudentId(studentId).orElseThrow(() -> new StudentNotFoundException("Аватар для студента с id " + studentId + " не найден"));
 
         Path filePath = Path.of(avatar.getFilePath());
         return Files.readAllBytes(filePath);
     }
 
     public byte[] getAvatarFromDb(Long studentId) {
-        Avatar avatar = findAvatarByStudentId(studentId)
-                .orElseThrow(() -> new StudentNotFoundException("Аватар для студента с id " + studentId + " не найден"));
+        Avatar avatar = findAvatarByStudentId(studentId).orElseThrow(() -> new StudentNotFoundException("Аватар для студента с id " + studentId + " не найден"));
 
         return avatar.getData();
     }
 
     public Avatar getAvatarInfo(Long studentId) {
-        return findAvatarByStudentId(studentId)
-                .orElseThrow(() -> new StudentNotFoundException("Аватар для студента с id " + studentId + " не найден"));
+        return findAvatarByStudentId(studentId).orElseThrow(() -> new StudentNotFoundException("Аватар для студента с id " + studentId + " не найден"));
     }
 }

@@ -41,22 +41,14 @@ public class FacultyService {
 
     public Faculty updateFaculty(Faculty faculty) {
         if (!facultyRepository.existsById(faculty.getId())) {
-            throw new FacultyNotFoundException(
-                    "Факультет с id: " + faculty.getId() + " не найден, обновление невозможно."
-            );
+            throw new FacultyNotFoundException("Факультет с id: " + faculty.getId() + " не найден, обновление невозможно.");
         }
-//        Проверяем на пустое название
         if (faculty.getName() == null || faculty.getName().trim().isEmpty()) {
             throw new FacultyValidationException("Название факультета не может быть пустым");
         }
-//        Проверяем на повторный ввод факультета
-        Optional<Faculty> existing = facultyRepository.findAll().stream()
-                .filter(f -> f.getName().equalsIgnoreCase(faculty.getName()) && f.getId() != faculty.getId())
-                .findFirst();
+        Optional<Faculty> existing = facultyRepository.findAll().stream().filter(f -> f.getName().equalsIgnoreCase(faculty.getName()) && f.getId() != faculty.getId()).findFirst();
         if (existing.isPresent()) {
-            throw new FacultyDuplicateException(
-                    "Факультет с названием '" + faculty.getName() + "' уже существует"
-            );
+            throw new FacultyDuplicateException("Факультет с названием '" + faculty.getName() + "' уже существует");
         }
         return facultyRepository.save(faculty);
     }

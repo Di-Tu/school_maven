@@ -1,6 +1,5 @@
 package ru.hogwarts.school.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
@@ -19,7 +18,6 @@ public class Faculty {
 
     @OneToMany(mappedBy = "faculty", fetch = FetchType.LAZY)
     @JsonManagedReference
-//    @JsonIgnore
     private Collection<Student> students;
 
     public Faculty() {
@@ -76,11 +74,6 @@ public class Faculty {
 
     @Override
     public String toString() {
-        return "Faculty{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", color='" + color + '\'' +
-                ", studentsCount=" + (students != null ? students.size() : 0) +
-                '}';
+        return "Faculty{" + "id=" + id + ", name='" + name + '\'' + ", color='" + color + '\'' + ", studentsCount=" + (students != null ? students.size() : 0) + '}';
     }
 }
