@@ -1,7 +1,5 @@
 package ru.hogwarts.school.controller;
 
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,40 +19,21 @@ public class AvatarController {
     }
 
     @PostMapping(value = "/{studentId}/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Long> uploadAvatar(@PathVariable Long studentId, @RequestParam MultipartFile avatar) {
-        try {
-            Avatar savedAvatar = avatarService.uploadAvatar(studentId, avatar);
-            return ResponseEntity.ok(savedAvatar.getId());
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+    public ResponseEntity<Long> uploadAvatar(@PathVariable Long studentId, @RequestPart("avatar") MultipartFile avatar) throws IOException {
+        return ResponseEntity.ok(avatarService.uploadAvatar(studentId, avatar).getId());
     }
 
     @GetMapping(value = "/{studentId}/from-db")
     public ResponseEntity<byte[]> getAvatarFromDb(@PathVariable Long studentId) {
-        byte[] data = avatarService.getAvatarFromDb(studentId);
         Avatar avatar = avatarService.getAvatarInfo(studentId);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.parseMediaType(avatar.getMediaType()));
-        headers.setContentLength(avatar.getFileSize());
-
-        return ResponseEntity.ok().headers(headers).body(data);
+        return ResponseEntity.ok().contentType(MediaType.parseMediaType(avatar.getMediaType())).contentLength(avatar.getData().length).body(avatar.getData());
     }
 
     @GetMapping(value = "/{studentId}/from-file")
-    public ResponseEntity<byte[]> getAvatarFromFile(@PathVariable Long studentId) {
-        try {
-            byte[] data = avatarService.getAvatarFromFile(studentId);
-            Avatar avatar = avatarService.getAvatarInfo(studentId);
+    public ResponseEntity<byte[]> getAvatarFromFile(@PathVariable Long studentId) throws IOException {
+        Avatar avatar = avatarService.getAvatarInfo(studentId);
+        byte[] data = avatarService.getAvatarFromFile(studentId);
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.parseMediaType(avatar.getMediaType()));
-            headers.setContentLength(avatar.getFileSize());
-
-            return ResponseEntity.ok().headers(headers).body(data);
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
+        return ResponseEntity.ok().contentType(MediaType.parseMediaType(avatar.getMediaType())).contentLength(data.length).body(data);
     }
 }

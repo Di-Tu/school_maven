@@ -10,6 +10,9 @@ import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.AvatarRepository;
 import ru.hogwarts.school.repository.StudentRepository;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -49,7 +52,7 @@ public class AvatarService {
         avatar.setFilePath(filePath.toString());
         avatar.setFileSize(avatarFile.getSize());
         avatar.setMediaType(avatarFile.getContentType());
-        avatar.setData(avatarFile.getBytes());
+        avatar.setData(generateDataForDB(filePath));
 
         Avatar savedAvatar = avatarRepository.save(avatar);
         return savedAvatar;
@@ -74,5 +77,27 @@ public class AvatarService {
 
     public Avatar getAvatarInfo(Long studentId) {
         return findAvatarByStudentId(studentId).orElseThrow(() -> new StudentNotFoundException("Аватар для студента с id " + studentId + " не найден"));
+    }
+
+    private byte[] generateDataForDB(Path filePath) throws IOException {
+        BufferedImage image = ImageIO.read(filePath.toFile());
+        if (image == null) {
+            throw new IOException("Не удалось прочитать изображение");
+        }
+
+        int height = image.getHeight() / (image.getWidth() / 100);
+        BufferedImage preview = new BufferedImage(100, height, BufferedImage.TYPE_INT_RGB);
+        Graphics2D graphics = preview.createGraphics();
+        graphics.drawImage(image, 0, 0, 100, height, null);
+        graphics.dispose();
+
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            ImageIO.write(preview, getExtensions(filePath.getFileName().toString()), baos);
+            return baos.toByteArray();
+        }
+    }
+
+    private String getExtensions(String fileName) {
+        return fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
     }
 }
