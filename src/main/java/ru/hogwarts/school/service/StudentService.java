@@ -66,4 +66,17 @@ public class StudentService {
         }
         return faculty;
     }
+
+    public int countStudents() {
+        return studentRepository.countStudents();
+    }
+
+    public double averageAgeStudents() {
+        Double avg = studentRepository.averageAgeStudents();
+        return (avg != null) ? avg : 0.0;
+    }
+
+    public Collection<Student> theLast5Students() {
+        return studentRepository.theLast5Students();
+    }
 }
