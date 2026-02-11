@@ -103,11 +103,6 @@ public class AvatarService {
         return fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
     }
 
-//    public Collection<Avatar> getAllAvatars(int page, int size) {
-//        PageRequest pageRequest = PageRequest.of(page - 1, size);
-//        return avatarRepository.findAll(pageRequest).getContent();
-//    }
-
     public Collection<Avatar> getAllAvatars(int page, int size) {
         PageRequest pageRequest = PageRequest.of(Math.max(page - 1, 0), size);
         return avatarRepository.findAll(pageRequest).getContent();
