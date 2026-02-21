@@ -1,5 +1,8 @@
 package ru.hogwarts.school.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -28,6 +31,8 @@ public class AvatarService {
     private final AvatarRepository avatarRepository;
     private final StudentRepository studentRepository;
 
+    private static final Logger logger = LoggerFactory.getLogger(AvatarService.class);
+
     private static final int BUFFER_SIZE = 1024;
 
     @Value("${path.to.avatars.folder}")
@@ -39,7 +44,11 @@ public class AvatarService {
     }
 
     public Avatar uploadAvatar(Long studentId, MultipartFile avatarFile) throws IOException {
-        Student student = studentRepository.findById(studentId).orElseThrow(() -> new StudentNotFoundException("Студент с id " + studentId + " не найден"));
+        logger.info("Was invoked method for upload avatar");
+        Student student = studentRepository.findById(studentId).orElseThrow(() -> {
+            logger.error("Student with id {} was not found for avatar upload", studentId);
+            return new StudentNotFoundException("Студент с id " + studentId + " не найден");
+        });
 
         Path filePath = Path.of(avatarsDir, studentId + "_" + avatarFile.getOriginalFilename());
         Files.createDirectories(filePath.getParent());
@@ -61,29 +70,43 @@ public class AvatarService {
     }
 
     public Optional<Avatar> findAvatarByStudentId(Long studentId) {
+        logger.info("Was invoked method for find avatar by student id");
         return avatarRepository.findByStudentId(studentId);
     }
 
     public byte[] getAvatarFromFile(Long studentId) throws IOException {
-        Avatar avatar = findAvatarByStudentId(studentId).orElseThrow(() -> new StudentNotFoundException("Аватар для студента с id " + studentId + " не найден"));
-
+        logger.info("Was invoked method for getting avatar from file");
+        Avatar avatar = findAvatarByStudentId(studentId).orElseThrow(() -> {
+            logger.error("Avatar for student with id {} not found", studentId);
+            return new StudentNotFoundException("Аватар для студента с id " + studentId + " не найден");
+        });
         Path filePath = Path.of(avatar.getFilePath());
         return Files.readAllBytes(filePath);
     }
 
     public byte[] getAvatarFromDb(Long studentId) {
-        Avatar avatar = findAvatarByStudentId(studentId).orElseThrow(() -> new StudentNotFoundException("Аватар для студента с id " + studentId + " не найден"));
-
+        logger.info("Was invoked method for getting avatar from db");
+        Avatar avatar = findAvatarByStudentId(studentId).orElseThrow(() -> {
+            logger.error("Avatar for student with id {} not found", studentId);
+            return new StudentNotFoundException("Аватар для студента с id " + studentId + " не найден");
+        });
         return avatar.getData();
     }
 
     public Avatar getAvatarInfo(Long studentId) {
-        return findAvatarByStudentId(studentId).orElseThrow(() -> new StudentNotFoundException("Аватар для студента с id " + studentId + " не найден"));
+        logger.info("Was invoked method for getting avatar info");
+        return findAvatarByStudentId(studentId).orElseThrow(() -> {
+            logger.error("Avatar for student with id {} not found", studentId);
+            return new StudentNotFoundException("Аватар для студента с id " + studentId + " не найден");
+        });
     }
 
     private byte[] generateDataForDB(Path filePath) throws IOException {
+        logger.info("Was invoked method for generating data for db");
         BufferedImage image = ImageIO.read(filePath.toFile());
         if (image == null) {
+            logger.warn("Image file at {} is corrupted or not an image", filePath);
+            logger.error("Unable to read image");
             throw new IOException("Не удалось прочитать изображение");
         }
 
@@ -100,10 +123,13 @@ public class AvatarService {
     }
 
     private String getExtensions(String fileName) {
+        logger.info("Was invoked method for getting extensions");
         return fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
     }
 
     public Collection<Avatar> getAllAvatars(int page, int size) {
+        logger.info("Was invoked method for getting all avatars");
+        logger.debug("Pagination params: page={}, size={}", page, size);
         PageRequest pageRequest = PageRequest.of(Math.max(page - 1, 0), size);
         return avatarRepository.findAll(pageRequest).getContent();
     }
