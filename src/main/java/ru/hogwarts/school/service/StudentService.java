@@ -11,7 +11,8 @@ import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.StudentRepository;
 
-import java.util.Collection;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class StudentService {
@@ -107,5 +108,32 @@ public class StudentService {
     public Collection<Student> theLast5Students() {
         logger.info("Was invoked method for the last 5 Students");
         return studentRepository.theLast5Students();
+    }
+
+    public Map<Faculty, Set<String>> groupingByFaculty() {
+        logger.info("Was invoked method for grouping by faculty");
+        List<Student> allStudents = studentRepository.findAll();
+        Map<Faculty, Set<String>> studentsByFaculties = allStudents.stream()
+                .parallel()
+                .filter(s -> s.getName().length() > 5)
+                .collect(Collectors.groupingBy(Student::getFaculty, Collectors.mapping(Student::getName, Collectors.toSet())));
+        return studentsByFaculties;
+    }
+
+    public Collection<String> studentsNamesStartingA() {
+        logger.info("Was invoked method for studentsNamesStartingA");
+        return studentRepository.findAll().stream()
+                .map(s -> s.getName().toUpperCase())
+                .filter(name -> name.startsWith("A"))
+                .sorted()
+                .toList();
+    }
+
+    public double studentsAgeMiddle() {
+        logger.info("Was invoked method for studentsAgeMiddle");
+        return studentRepository.findAll().stream()
+                .mapToInt(Student::getAge)
+                .average()
+                .orElse(0.0);
     }
 }
