@@ -17,6 +17,16 @@ public class StudentController {
         this.studentService = studentService;
     }
 
+    @GetMapping("/a")
+    public Collection<String> getStudentsNamesStartingA() {
+        return studentService.studentsNamesStartingA();
+    }
+
+    @GetMapping("age/middle")
+    public double getStudentsAgeMiddle() {
+        return studentService.studentsAgeMiddle();
+    }
+
     @GetMapping("/{id}")
     public Student getStudentId(@PathVariable Long id) {
         return studentService.findStudentById(id);
@@ -45,7 +55,7 @@ public class StudentController {
     @GetMapping("/count")
     public int countStudents() {
         return studentService.countStudents();
-    };
+    }
 
     @GetMapping("/age/average")
     public double averageAgeStudents() {

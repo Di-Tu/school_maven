@@ -16,6 +16,16 @@ public class FacultyController {
         this.facultyService = facultyService;
     }
 
+    @GetMapping("/search/longname")
+    public String getTheLongestName() {
+        return facultyService.theLongestName();
+    }
+
+    @GetMapping("Calculation")
+    public int leftCalculation() {
+        return facultyService.leftCalculation();
+    }
+
     @GetMapping("/{id}")
     public Faculty getFacultyId(@PathVariable Long id) {
         return facultyService.findFacultyById(id);

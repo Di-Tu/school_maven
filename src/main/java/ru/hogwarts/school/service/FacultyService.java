@@ -14,7 +14,9 @@ import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.repository.StudentRepository;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 public class FacultyService {
@@ -91,5 +93,22 @@ public class FacultyService {
             throw new NotFoundException("Факультет с id " + id + " не найден.");
         }
         return studentRepository.findByFacultyId(id);
+    }
+
+    public String theLongestName() {
+        logger.info("Was invoked method the Longest name faculty");
+        return facultyRepository.findAll().stream()
+                .map(Faculty::getName)
+                .max(Comparator.comparingInt(String::length))
+                .get();
+    }
+
+    public int leftCalculation() {
+        logger.info("Was invoked method left calculation");
+        int sum = Stream.iterate(1, a -> a + 1)
+                .parallel()
+                .limit(1_000_000)
+                .reduce(0, (a, b) -> a + b);
+        return sum;
     }
 }
