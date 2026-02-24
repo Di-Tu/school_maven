@@ -136,4 +136,38 @@ public class StudentService {
                 .average()
                 .orElse(0.0);
     }
+
+    public synchronized void printStudentsNameSynchronized(Student student) {
+        System.out.println(student.getName());
+    }
+
+    public void streamPrintNames() {
+        logger.info("Was invoked method for streamPrintNames");
+        Student[] first6Students = studentRepository.findFirst6ByOrderByIdAsc();
+        System.out.println(first6Students[0].getName());
+        System.out.println(first6Students[1].getName());
+        new Thread(() -> {
+            System.out.println(first6Students[2].getName());
+            System.out.println(first6Students[3].getName());
+        }).start();
+        new Thread(() -> {
+            System.out.println(first6Students[4].getName());
+            System.out.println(first6Students[5].getName());
+        }).start();
+    }
+
+    public void streamSynchronizedPrintNames() {
+        logger.info("Was invoked method for StreamSynchronizedPrintNames");
+        Student[] first6Students = studentRepository.findFirst6ByOrderByIdAsc();
+        printStudentsNameSynchronized(first6Students[0]);
+        printStudentsNameSynchronized(first6Students[1]);
+        new Thread(() -> {
+            printStudentsNameSynchronized(first6Students[2]);
+            printStudentsNameSynchronized(first6Students[3]);
+        }).start();
+        new Thread(() -> {
+            printStudentsNameSynchronized(first6Students[4]);
+            printStudentsNameSynchronized(first6Students[5]);
+        }).start();
+    }
 }

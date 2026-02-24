@@ -17,12 +17,22 @@ public class StudentController {
         this.studentService = studentService;
     }
 
+    @GetMapping("/print-parallel")
+    public void getStreamPrintNames() {
+        studentService.streamPrintNames();
+    }
+
+    @GetMapping("/print-synchronized")
+    public void getStreamSynchronizedPrintNames() {
+        studentService.streamSynchronizedPrintNames();
+    }
+
     @GetMapping("/a")
     public Collection<String> getStudentsNamesStartingA() {
         return studentService.studentsNamesStartingA();
     }
 
-    @GetMapping("age/middle")
+    @GetMapping("/age/middle")
     public double getStudentsAgeMiddle() {
         return studentService.studentsAgeMiddle();
     }
